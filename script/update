@@ -8,7 +8,7 @@ DOTFILESDIR=$(pwd -P)
 [ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
 [ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
 [ -f "`which brew`" ] && export BREW=1
-brew list -1 | grep -q "^bundle\$" && export BREWBUNDLE=1 
+brew tap -1 | grep -q "^bundle\$" && export BREWBUNDLE=1 
 [ -f "$HOME/.Brewfile" ] && export BREWFILE=1
 
 ./script/setup
