@@ -3,9 +3,35 @@
 
 DOTFILESDIRREL=$(dirname $0)
 cd $DOTFILESDIRREL/..
+DOTFILESDIR=$(pwd -P)
+
+[ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
+[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
+[ -f "`which brew`" ] && export BREW=1
+brew list -1 | grep -q "^bundle\$" && export BREWBUNDLE=1 
+[ -f "$HOME/.Brewfile" ] && export BREWFILE=1
 
 ./script/setup
 
-if [ -f "$HOME/.Brewfile" ]; then
-  brew bundle --global
+if [ $OSX ]
+then
+  if [ $BREW ]
+  then
+    if [ $BREWBUNDLE ]
+    then
+      if [ $BREWFILE ]
+      then
+        brew bundle --global
+      else
+        echo "'brew bundle' could not be run because no Brewfile was found."
+	echo "Create a Brewfile at ~/.Brewfile before continuing."
+      fi
+    else
+      echo "'brew bundle' could not be run because Homebrew Bundle tap not installed."
+      echo "Run 'brew tap Homebrew/bundle' before continuing."
+    fi
+  else
+    echo "'brew bundle' could not run because Homebrew is not installed."
+    echo "Follow the installation steps at http://brew.sh before continuing."
+  fi
 fi
