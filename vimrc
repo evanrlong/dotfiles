@@ -20,6 +20,15 @@ set hlsearch
 " Make vim yank and pull using system clipboard
 set clipboard+=unnamedplus
 
+" tell vim to keep a backup file
+set backup
+
+" tell vim where to put its backup files
+set backupdir=/private/tmp
+
+" tell vim where to put swap files
+set dir=/private/tmp
+
 " I like highlighting strings inside C comments.
 let c_comment_strings=1
 
