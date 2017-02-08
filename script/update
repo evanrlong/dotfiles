@@ -11,8 +11,10 @@ DOTFILESDIR=$(pwd -P)
 brew tap -1 | grep -q "^homebrew/bundle\$" && export BREWBUNDLE=1 
 [ -f "$HOME/.Brewfile" ] && export BREWFILE=1
 
+echo "Updated dotfile symlinks..."
 ./script/setup
 
+echo "Updating system dependencies with Homebrew Bundle..."
 if [ $OSX ]
 then
   if [ $BREW ]
@@ -35,3 +37,5 @@ then
     echo "Follow the installation steps at http://brew.sh before continuing."
   fi
 fi
+
+echo "System successfully updated!"
