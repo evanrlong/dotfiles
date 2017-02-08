@@ -1,0 +1,11 @@
+#!/bin/sh
+# Update dotfiles and brew bundle installs
+
+DOTFILESDIRREL=$(dirname $0)
+cd $DOTFILESDIRREL/..
+
+./script/setup
+
+if [ -f "$HOME/.Brewfile" ]; then
+  brew bundle --global
+fi
