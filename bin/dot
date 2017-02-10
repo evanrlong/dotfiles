@@ -1,0 +1,110 @@
+#!/bin/sh
+# Dot - Install/Uninstall dotfiles in the home directory
+# Author:  Evan R Long (mail@evanrlong.com)
+# Created: 2/9/17
+# Updated: 2/9/17
+
+DOTFILESDIRREL=$(dirname $0)
+cd $DOTFILESDIRREL/..
+DOTFILESDIR=$(pwd -P)
+
+[ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
+[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
+uname -s | grep -q "_NT-" && export WINDOWS=1
+
+warning () {
+  echo "WARNING: $(basename $0): ${1:-"Unknown Warning"}" 1>&2
+  return 1 
+}
+
+get_dotfiles () {
+  find -H * -maxdepth 2 -name '*.symlink' -or  -name 'Brewfile' -not -path '*.git*'
+}
+
+parse_dotfile_name () {
+  local DOTFILE=$1
+  basename $DOTFILE | sed -e 's/\.symlink$//' | sed -e 's/\.sh$//'
+}
+
+create_src_path () {
+  local DOTFILE=$1
+  echo $DOTFILESDIR/$DOTFILE
+}
+
+create_target_path () {
+  local DOTFILE=$1
+  echo $HOME/.$(parse_dotfile_name $DOTFILE)
+}
+
+link_dotfile () {
+  local DOTFILE=$1 
+  local SRC=$(create_src_path $DOTFILE)
+  local TARGET=$(create_target_path $DOTFILE)
+  
+  if  [ ! -f $SRC ] && [ ! -d $SRC ] ; then
+    return $(warning "$LINENO: $DOTFILE does not exist.  Symlink failed.")
+  fi
+  
+  if [ $UNIX ]; then
+    if [ -L $TARGET ] && [ -d $TARGET ]; then
+      rm -r $TARGET
+    fi
+      ln -sfv "$SRC" "$TARGET"
+  else
+    cp -rv "$SRC" "$TARGET"
+  fi
+}
+
+unlink_dotfile () {
+  local DOTFILE=$1
+  local TARGET=$(create_target_path $DOTFILE)
+  
+  if  [ -L $TARGET ]; then
+    rm -rv $TARGET
+  fi
+}
+
+install_dotfiles () {
+  local DOTFILE 
+  for DOTFILE in $(get_dotfiles); do
+    link_dotfile $DOTFILE
+  done
+}
+
+help_menu () {
+echo "Install/Uninstall dotfiles in the Home directory.  Either individually or all at once."
+echo "Usage:"
+echo "  dot install"
+echo "  dot install <file>..."
+echo "  dot uninstall"
+echo "  dot uninstall <file>..."
+}
+
+if [ -z $1 ]; then
+  help_menu
+else
+  if [ -z $2 ]; then
+    DOTFILES=$(get_dotfiles)
+  else
+    DOTFILES=${@:2}
+  fi
+
+  case $1 in
+    install)
+      echo "Linking all dotfiles..."
+      for DOTFILE in $DOTFILES; do
+        link_dotfile $DOTFILE
+      done
+    ;;
+    uninstall)
+      echo "Unlinking all dotfiles..."
+      for DOTFILE in $DOTFILES; do
+        unlink_dotfile $DOTFILE
+      done
+    ;;
+    *)
+      echo "Invalid argument!"
+      help_menu
+    ;;
+  esac
+fi
