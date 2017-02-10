@@ -589,14 +589,16 @@
 			<true/>
 			<key>Background Color</key>
 			<dict>
+				<key>Alpha Component</key>
+				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.094117647058823528</real>
+				<real>0.082661725580692291</real>
 				<key>Color Space</key>
-				<string>sRGB</string>
+				<string>Calibrated</string>
 				<key>Green Component</key>
-				<real>0.094117647058823528</real>
+				<real>0.0</real>
 				<key>Red Component</key>
-				<real>0.094117647058823528</real>
+				<real>0.76130861043930054</real>
 			</dict>
 			<key>Background Image Location</key>
 			<string></string>
@@ -1226,5 +1228,9 @@ tmux attach -t base || tmux new -s base</string>
 	<false/>
 	<key>iTerm Version</key>
 	<string>3.0.14</string>
+	<key>kCPKSelectionViewPreferredModeKey</key>
+	<integer>0</integer>
+	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
+	<false/>
 </dict>
 </plist>
