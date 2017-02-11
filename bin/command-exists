@@ -1,0 +1,35 @@
+#!/bin/sh
+# Checks if a command is installed on the current sytem
+
+help_menu () {
+  echo "Checks if a command is installed on the current system."
+  echo "Usage:"
+  echo "  command-exists [options] <command>"
+  echo "Options:"
+  echo "  -q --quiet        Suppress printed output"
+}
+
+command_exists () {
+  COMMAND=$1 QUIET=$2
+  if type $COMMAND &> /dev/null; then
+    [ $QUIET = 0 ] && echo "'$COMMAND' exists on system."
+    exit 0
+  else
+    [ $QUIET = 0 ] && echo "'$COMMAND' doesn't exist on system."
+    exit 1
+  fi
+}
+
+COMMAND=$1 QUIET=0
+case $1 in
+  -q|--quiet)
+    COMMAND=$2
+    QUIET=1
+    ;;
+esac
+
+if [ -z $COMMAND ]; then
+  help_menu
+else
+  command_exists $COMMAND $QUIET
+fi
