@@ -12,3 +12,5 @@ zstyle :compinstall filename '/Users/evanlong/.zshrc'
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
+
+source_sh ~/.shrc

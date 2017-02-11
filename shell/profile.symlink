@@ -1,0 +1,2 @@
+export DOTFILES_DIR=~/.dotfiles
+export PATH=$PATH:~/.dotfiles/bin

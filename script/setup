@@ -6,7 +6,7 @@
 
 DOTFILESDIRREL=$(dirname $0)
 cd $DOTFILESDIRREL/..
-DOTFILESDIR=$(pwd -P)
+export DOTFILESDIR=$(pwd -P)
 
-echo "Installed dotfiles in home directory..."
+echo "Installing dotfiles in home directory..."
 $DOTFILESDIR/bin/dot install
