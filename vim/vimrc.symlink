@@ -38,6 +38,9 @@ let c_comment_strings=1
 " Also load indent files, to automatically do language-dependent indenting.
 filetype plugin indent on
 
+" Additional filetype syntax highlighting
+au BufNewFile,BufRead ~/.dotfiles/*.symlink set filetype=sh
+
 " Put these in an autocmd group, so that we can delete them easily.
 augroup vimrcEx
   autocmd!
