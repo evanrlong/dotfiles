@@ -1,2 +1,10 @@
 export DOTFILES_DIR=~/.dotfiles
-export PATH=$PATH:~/.dotfiles/bin
+
+add_to_path () {
+  case ":$PATH:" in
+    *":$1:"*) :;;  #already there
+    *) PATH="$PATH:$1";;
+  esac
+}
+
+add_to_path ~/.dotfiles/bin
