@@ -1,0 +1,14 @@
+# shrc - for shared interactive shell settings (between bash and zsh)
+
+# Aliases
+alias dotfiles="cd $DOTFILES_DIR"
+alias vim="nvim"
+alias tmuxup='tmux source-file ~/.tmux.conf'
+alias zshup='tmux-all-panes ". ~/.zprofile && . ~/.zshrc "'
+
+# Source all files with .shrc extension
+SOURCES=$(find -H $DOTFILES_DIR -name '*.shrc' -not -path '*.git*')
+for SOURCE in $SOURCES; do
+  . $SOURCE
+done
+unset SOURCES SOURCE

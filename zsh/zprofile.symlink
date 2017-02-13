@@ -1,6 +1,12 @@
-source_sh () {
-  emulate -LR sh
-  . "$@"
-}
+# zprofile - for zsh specific environment variables and other session settings
 
-source_sh ~/.profile
+# Source .profile in sh emulation mode
+# From http://superuser.com/a/187673
+emulate sh -c '. ~/.profile'
+
+# Source all files with .zprofile extension
+SOURCES=$(find -H $DOTFILES_DIR -name '*.zprofile' -not -path '*.git*')
+for SOURCE in $SOURCES; do
+  . $SOURCE
+done
+unset SOURCES SOURCE

@@ -1,0 +1,25 @@
+# profile - for global session settings such as environment variables and $PATH
+
+# Environment Variables
+export DOTFILES_DIR=~/.dotfiles
+[ $(uname -s) = "Darwin" ] && export MACOS=1 && export UNIX=1
+[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
+uname -s | grep -q "_NT-" && export WINDOWS=1
+
+# Adds directory or file to $PATH if it does not already exist
+add_to_path () {
+  case ":$PATH:" in
+    *":$1:"*) :;;  #already there
+    *) PATH="$PATH:$1";;
+  esac
+}
+
+# $PATH additions
+add_to_path $DOTFILES_DIR/bin
+
+# Source all files with .profile extension
+SOURCES=$(find -H $DOTFILES_DIR -name '*.profile' -not -path '*.git*')
+for SOURCE in $SOURCES; do
+  . $SOURCE
+done
+unset SOURCES SOURCE

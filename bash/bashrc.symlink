@@ -1,1 +1,10 @@
+# bashrc - for bash specific interactive shell settings
+
 source ~/.shrc
+
+# Source all files with .bashrc extension
+SOURCES=$(find -H $DOTFILES_DIR -name '*.bashrc' -not -path '*.git*')
+for SOURCE in $SOURCES; do
+  . $SOURCE
+done
+unset SOURCES SOURCE

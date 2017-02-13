@@ -1,3 +1,5 @@
+# zshrc - for zsh specific interactive shell settings
+
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
 HISTSIZE=1000
@@ -13,4 +15,13 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-source_sh ~/.shrc
+# Source .shrc in sh emulation mode
+# From http://superuser.com/a/187673
+emulate sh -c '. ~/.shrc'
+
+# Source all files with .zshrc extension
+SOURCES=$(find -H $DOTFILES_DIR -name '*.zshrc' -not -path '*.git*')
+for SOURCE in $SOURCES; do
+  . $SOURCE
+done
+unset SOURCES SOURCE

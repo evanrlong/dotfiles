@@ -1,0 +1,13 @@
+# bash_profile - for bash specific environment variables and other session settings
+
+# Source .profile and .bashrc if shell is interactive
+# From http://superuser.com/a/183980
+if [ -r ~/.profile ]; then . ~/.profile; fi
+case "$-" in *i*) if [ -r ~/.bashrc ]; then . ~/.bashrc; fi;; esac
+
+# Source all files with .bash_profile extension
+SOURCES=$(find -H $DOTFILES_DIR -name '*.bash_profile' -not -path '*.git*')
+for SOURCE in $SOURCES; do
+  . $SOURCE
+done
+unset SOURCES SOURCE

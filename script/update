@@ -1,21 +1,15 @@
 #!/bin/sh
 # Update dotfiles and brew bundle installs
 
-DOTFILESDIRREL=$(dirname $0)
-cd $DOTFILESDIRREL/..
-DOTFILESDIR=$(pwd -P)
+echo "Updating dotfile symlinks..."
+$DOTFILES_DIR/bin/dot install
 
-echo "Updated dotfile symlinks..."
-$DOTFILESDIR/bin/dot install
-
-[ $(uname -s) = "Darwin" ] && export OSX=1 && export UNIX=1
-[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
 [ -f "`which brew`" ] && export BREW=1
 brew tap -1 | grep -q "^homebrew/bundle\$" && export BREWBUNDLE=1 
 [ -f "$HOME/.Brewfile" ] && export BREWFILE=1
 
 echo "Updating system dependencies with Homebrew Bundle..."
-if [ $OSX ]
+if [ $MACOS ]
 then
   if [ $BREW ]
   then

@@ -1,12 +1,10 @@
 #!/bin/sh
 # script/setup - Installs all dotfile dependencies after system is Bootstrapped
-# Author: Evan R. Long (mail@evanrlong.com)
-# Created: 2/9/17
-# Updated: 2/9/17
 
-DOTFILESDIRREL=$(dirname $0)
-cd $DOTFILESDIRREL/..
-export DOTFILESDIR=$(pwd -P)
+export DOTFILES_DIR=~/.dotfiles
+[ $(uname -s) = "Darwin" ] && export MACOS=1 && export UNIX=1
+[ $(uname -s) = "Linux" ] && export LINUX=1 && export UNIX=1
+uname -s | grep -q "_NT-" && export WINDOWS=1
 
 echo "Installing dotfiles in home directory..."
-$DOTFILESDIR/bin/dot install
+$DOTFILES_DIR/bin/dot install
