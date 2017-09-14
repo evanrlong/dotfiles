@@ -14,8 +14,8 @@ brew 'tmux'
 brew 'zsh'
 brew 'reattach-to-user-namespace'
 brew 'neovim'
-brew 'chunkwm'
-brew 'khd'
+brew 'chunkwm', restart_service: :changed
+brew 'khd', restart_service: :changed
 cask 'iterm2'
 cask 'google-chrome'
 cask 'firefox'
