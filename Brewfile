@@ -19,3 +19,4 @@ brew 'khd', restart_service: :changed
 cask 'iterm2'
 cask 'google-chrome'
 cask 'firefox'
+cask 'alfred'
