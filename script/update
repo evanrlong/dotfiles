@@ -32,4 +32,4 @@ then
   fi
 fi
 
-echo "System successfully updated!"
+echo "System successfully updated! Some updates may require a system restart to take effect."

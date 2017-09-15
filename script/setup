@@ -8,3 +8,8 @@ uname -s | grep -q "_NT-" && export WINDOWS=1
 
 echo "Installing dotfiles in home directory..."
 $DOTFILES_DIR/bin/dot install
+
+echo "Setting default retina display scaling..."
+$DOTFILES_DIR/bin/display-scaler 4
+
+echo "Setup successful!  Please restart you computer to complete installation."
