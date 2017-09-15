@@ -10,7 +10,7 @@
 	<key>ejectKeywordEnabled</key>
 	<true/>
 	<key>ejectType</key>
-	<integer>0</integer>
+	<integer>2</integer>
 	<key>ejectallKeywordEnabled</key>
 	<true/>
 </dict>
