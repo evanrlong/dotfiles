@@ -1,0 +1,42 @@
+#!/bin/bash
+#An Applescript embedded in a shell script so I can do this on the command line. Sorry.
+
+#Don't put this on a non retina Mac. Bad Things™ will happen.
+
+#by @tomcatterall/@ares (Twitter/App.net). Say something nice to me if you use and like this, I'd love to know.
+
+echo 'on run argv
+  try
+		set theDisplayArgument to item 1 of argv as number
+	on error
+		return "
+Scaler. Scale your Retina display from the Terminal!
+Usage:
+1 is Larger Text (hangovers), 5 is More Space (Xcode), 3 is gravy, and there are some numbers in between.
+"
+	end try
+	if theDisplayArgument < 1 or theDisplayArgument > 5 then
+		return "Pick a number between 1 and 5."
+	end if
+	tell application "System Preferences"
+		activate
+		set the current pane to pane id "com.apple.preference.displays"
+		reveal anchor "displaysDisplayTab" of pane id "com.apple.preference.displays"
+	end tell
+
+	tell application "System Events"
+		repeat until tab group 1 of window "Built-in Retina Display" of process "System Preferences" exists
+			delay 1
+		end repeat
+
+		click radio button "Scaled" of radio group 1 of  tab group 1 of window "Built-in Retina Display" of process "System Preferences"	
+		click radio button theDisplayArgument of radio group 1 of group 1 of tab group 1 of window "Built-in Retina Display" of application process "System Preferences" of application "System Events"
+		if theDisplayArgument = 1 then
+			click button "OK" of sheet 1 of window "Color LCD" of application process "System Preferences" of application "System Events"
+		end if
+	end tell
+
+	tell application "System Preferences"
+		quit
+	end tell
+end run'|osascript - $1
