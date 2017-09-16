@@ -19,7 +19,6 @@ Usage:
 		return "Pick a number between 1 and 5."
 	end if
 	tell application "System Preferences"
-		activate
 		set the current pane to pane id "com.apple.preference.displays"
 		reveal anchor "displaysDisplayTab" of pane id "com.apple.preference.displays"
 	end tell
