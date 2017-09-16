@@ -12,6 +12,14 @@ get_dotfiles () {
   find -H * -maxdepth 2 -name '*.symlink' -or  -name 'Brewfile' -not -path '*.git*'
 }
 
+get_install_scripts () {
+  find -H * -maxdepth 2 -name 'install.sh' -not -path '*.git*'
+}
+
+get_uninstall_scripts () {
+  find -H * -maxdepth 2 -name 'uninstall.sh' -not -path '*.git*'
+}
+
 parse_dotfile_name () {
   local DOTFILE=$1
   basename $DOTFILE | sed -e 's/\.symlink$//' | sed -e 's/\.sh$//'
@@ -55,42 +63,70 @@ unlink_dotfile () {
   fi
 }
 
-install_dotfiles () {
-  local DOTFILE 
-  for DOTFILE in $(get_dotfiles); do
-    link_dotfile $DOTFILE
-  done
+run_script () {
+  local SCRIPT=$1
+  bash $SCRIPT
 }
 
 help_menu () {
 echo "Install/Uninstall dotfiles in the Home directory.  Either individually or all at once."
 echo "Usage:"
 echo "  dot install"
-echo "  dot install <file>..."
 echo "  dot uninstall"
-echo "  dot uninstall <file>..."
+echo "  dot link <file> ..."
+echo "  dot unlink <file>..."
+echo "  dot run <script>..."
 }
 
 if [ -z $1 ]; then
   help_menu
 else
-  if [ -z $2 ]; then
-    DOTFILES=$(get_dotfiles)
-  else
-    DOTFILES=${@:2}
-  fi
-
   case $1 in
     install)
       echo "Linking all dotfiles..."
+      DOTFILES=$(get_dotfiles)
       for DOTFILE in $DOTFILES; do
         link_dotfile $DOTFILE
+      done
+
+      echo "Running all install scripts..."
+      SCRIPTS=$(get_install_scripts)
+      for SCRIPT in $SCRIPTS; do
+        run_script $SCRIPT
       done
     ;;
     uninstall)
       echo "Unlinking all dotfiles..."
+      DOTFILES=$(get_dotfiles)
       for DOTFILE in $DOTFILES; do
         unlink_dotfile $DOTFILE
+      done
+
+      echo "Running all uninstall scripts"
+      SCRIPTS=$(get_uninstall_scripts)
+      for SCRIPT in $SCRIPTS; do
+	run_script $SCRIPT
+      done
+    ;;
+    link)
+      echo "Linking dotfiles..."
+      DOTFILES=${@:2}
+      for DOTFILE in $DOTFILES; do
+        link_dotfile $DOTFILE
+      done
+    ;;
+    unlink)
+      echo "Unlinking dotfiles..."
+      DOTFILES=${@:2}
+      for DOTFILE in $DOTFILES; do
+        unlink_dotfile $DOTFILE
+      done
+    ;;
+    run)
+      echo "Running scripts..."
+      SCRIPTS=${@:2}
+      for SCRIPT in $SCRIPTS; do
+        run_script $SCRIPT
       done
     ;;
     *)
