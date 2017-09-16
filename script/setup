@@ -12,4 +12,8 @@ $DOTFILES_DIR/bin/dot install
 echo "Setting default retina display scaling..."
 $DOTFILES_DIR/bin/display-scaler 5
 
+echo "Disabling Spotlight global shortcuts..."
+$DOTFILES_DIR/bin/macos-shortcutter disable -a "Spotlight" -s "Show Spotlight search"
+$DOTFILES_DIR/bin/macos-shortcutter disable -a "Spotlight" -s "Show Finder search window"
+
 echo "Setup successful!  Please restart you computer to complete installation."

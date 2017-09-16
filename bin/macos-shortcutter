@@ -1,0 +1,112 @@
+#!/bin/bash
+
+commandArg=$1;
+applicationArg="";
+shortcutArg="";
+
+OPTIND=2
+while getopts "a:s:" opt; do
+	case "$opt" in
+		a) 	applicationArg=$OPTARG;
+		   	;;
+		s) 	shortcutArg=$OPTARG;
+			;;
+		\?)	exit 1
+			;;
+		:)	exit 1	
+			;;
+	esac
+done
+
+
+
+if [[ $commandArg == "" ]]; then
+	echo ""
+	echo "MacOS shortcutter. Enable/disable global and application shortcuts for macOS from the Terminal."
+	echo "Usage:"
+	echo "enable -a [application name] -s [shortcut name]"
+	echo "disable -a [application name] -s [shortcut name]"show_help;
+	echo ""
+	exit 0;
+fi
+
+if [[ $commandArg != "enable" && $commandArg != "disable" ]]; then
+	echo "$commandArg is an invalid command";
+	exit 1;
+fi
+
+if [[ $applicationArg == "" ]]; then
+	echo "Application name argument -a is required";
+	exit 1;
+fi
+
+if [[ $shortcutArg == "" ]]; then
+	echo "Shortcut name argument -s is required";
+	exit 1;
+fi
+
+osascript <<EOD
+on run argv
+	tell application "System Preferences"
+		#activate
+		set the current pane to pane id "com.apple.preference.keyboard"
+		reveal anchor "shortcutsTab" of pane id "com.apple.preference.keyboard"
+	end tell
+
+	tell application "System Events"
+		# wait until window is loaded
+		repeat until table 1 of scroll area 1 of splitter group 1 of tab group 1 of window "Keyboard" of process "System Preferences" exists
+			delay 1
+		end repeat
+	
+		# find and select application from list
+		set rowList to rows of table 1 of scroll area 1 of splitter group 1 of tab group 1 of window "Keyboard" of process "System Preferences"
+		repeat with uiElem in rowList as list
+			set staticText to value of static text 1 of uiElem as string
+			if staticText = "$applicationArg" then
+				select uiElem	
+			end if
+		end repeat
+
+		# wait until shortcuts for application have been loaded
+		repeat until outline 1 of scroll area 2 of splitter group 1 of tab group 1 of window "Keyboard" of application process "System Preferences" exists
+			delay 1
+		end repeat
+
+		# set an enable check based on the input command
+		if "$commandArg" = "enable" then
+			set enableCheck to false
+		else
+			set enableCheck to true
+		end if
+
+		#enable or disable shortcut
+		set optionsList to row of outline 1 of scroll area 2 of splitter group 1 of tab group 1 of window "Keyboard" of application process "System Preferences"
+		repeat with uiElem in optionsList as list
+			set staticText to name of UI element 2 of uiElem as string
+			if staticText = "missing value" then set staticText to value of static text 1 of UI element 2 of uiElem as string
+			if staticText = "$shortcutArg" then
+				set checkboxStatus to value of checkbox 1 of UI element 1 of uiElem as boolean
+				if checkboxStatus is enableCheck then click checkbox 1 of UI element 1 of uiElem
+			end if
+		end repeat
+	end tell
+
+	tell application "System Preferences"
+		quit
+	end tell
+end run
+
+on split_string(theString, theDelimiter)
+	-- save delimiters to restore old settings
+	set oldDelimiters to AppleScript's text item delimiters
+	-- set delimiters to delimiter to be used
+	set AppleScript's text item delimiters to theDelimiter
+	-- create the array
+	set theArray to every text item of theString
+	-- restore the old setting
+	set AppleScript's text item delimiters to oldDelimiters
+	-- return the result
+	return theArray
+end theSplit
+EOD
