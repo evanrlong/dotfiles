@@ -1,8 +1,6 @@
 #!/bin/sh
 # Update dotfiles and brew bundle installs
 
-echo "Updating dotfile symlinks..."
-$DOTFILES_DIR/bin/dot install
 
 [ -f "`which brew`" ] && export BREW=1
 brew tap -1 | grep -q "^homebrew/bundle\$" && export BREWBUNDLE=1 
@@ -31,5 +29,12 @@ then
     echo "Follow the installation steps at http://brew.sh before continuing."
   fi
 fi
+
+
+echo "Updating dotfile symlinks..."
+$DOTFILES_DIR/bin/dot install
+
+echo "Installing macOS presets..."
+$DOTFILES_DIR/bin/macos
 
 echo "System successfully updated! Some updates may require a system restart to take effect."

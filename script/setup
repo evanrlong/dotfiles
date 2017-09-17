@@ -9,6 +9,9 @@ uname -s | grep -q "_NT-" && export WINDOWS=1
 echo "Installing dotfiles in home directory..."
 $DOTFILES_DIR/bin/dot install
 
+echo "Installing macOS presets..."
+$DOTFILES_DIR/bin/macos
+
 echo "Setting default retina display scaling..."
 $DOTFILES_DIR/bin/display-scaler 5
 

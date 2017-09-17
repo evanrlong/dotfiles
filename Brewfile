@@ -16,6 +16,7 @@ brew 'reattach-to-user-namespace'
 brew 'neovim'
 brew 'chunkwm', restart_service: :changed
 brew 'khd', restart_service: :changed
+brew 'dark-mode'
 cask 'iterm2'
 cask 'google-chrome'
 cask 'firefox'
