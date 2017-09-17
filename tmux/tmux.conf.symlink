@@ -12,3 +12,13 @@ if "test ! -d ~/.tmux/plugins/tpm" \
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
+
+# Set escape time to 0 to avoid delays in Vim usage
+set -sg escape-time 0
+
+# Change default tmux shortcut to alt-space
+set-option -g prefix M-Space
+bind M-Space send-prefix
+
+# reload config
+bind M-R source-file ~/.tmux.conf
