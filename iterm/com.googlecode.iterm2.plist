@@ -7,7 +7,7 @@
 	<key>AboutToPasteTabsWithCancel_selection</key>
 	<integer>2</integer>
 	<key>AdjustWindowForFontSizeChange</key>
-	<false/>
+	<true/>
 	<key>AllowClipboardAccess</key>
 	<false/>
 	<key>AlternateMouseScroll</key>
@@ -412,7 +412,7 @@
 		<integer>1</integer>
 	</dict>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>269 156 796 473 0 0 1920 1177 </string>
+	<string>269 202 796 473 0 0 1920 1177 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
 	<string>20 100 1880 1060 0 0 1920 1177 </string>
 	<key>New Bookmarks</key>
@@ -1228,7 +1228,7 @@ tmux attach -t base || tmux new -s base</string>
 	<key>UseCompactLabel</key>
 	<true/>
 	<key>UseLionStyleFullscreen</key>
-	<false/>
+	<true/>
 	<key>WebKitDefaultFontSize</key>
 	<integer>11</integer>
 	<key>WebKitStandardFont</key>
