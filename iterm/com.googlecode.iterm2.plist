@@ -406,10 +406,15 @@
 	</data>
 	<key>NSTableView Supports v2 KeyBingingTable</key>
 	<true/>
+	<key>NSToolbar Configuration com.apple.NSColorPanel</key>
+	<dict>
+		<key>TB Is Shown</key>
+		<integer>1</integer>
+	</dict>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>269 148 796 473 0 0 1920 1178 </string>
+	<string>269 122 796 473 0 0 1920 1200 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>20 100 1880 1060 0 0 1920 1178 </string>
+	<string>20 25 1879 1149 0 0 1920 1200 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
