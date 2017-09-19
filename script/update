@@ -15,6 +15,7 @@ then
     then
       if [ $BREWFILE ]
       then
+	brew bundle cleanup --global --force
         brew bundle --global
       else
         echo "'brew bundle' could not be run because no Brewfile was found."
