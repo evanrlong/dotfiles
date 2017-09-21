@@ -9,7 +9,7 @@ warning () {
 }
 
 get_dotfiles () {
-  find -H * -maxdepth 2 -name '*.symlink' -or  -name 'Brewfile' -not -path '*.git*'
+  find -H * -maxdepth 2 -name '*.symlink' -not -path '*.git*'
 }
 
 get_install_scripts () {

@@ -51,21 +51,21 @@ if [ -n "$MACOS" ]; then
   logk
   [ -n "$SIP" ] && log "SIP is enabled" || log "SIP is disabled"
   
-  if [ -n "$SIP" ]; then
-    logn "Linking Brewfile to home directory:#"
-    ln -sf $DOTFILES_DIR/Brewfile ~/.Brewfile
-    logk
+  #if [ -n "$SIP" ]; then
+  #  logn "Linking Brewfile to home directory:#"
+  #  ln -sf $DOTFILES_DIR/Brewfile ~/.Brewfile
+  #  logk
 
-    log "Starting Strap:"
-    $DOTFILES_DIR/lib/strap --cached-credentials
-  fi
+  #  log "Starting Strap:"
+  #  $DOTFILES_DIR/lib/strap --cached-credentials
+  #fi
 
-  log "Installing macOS presets:"
-  $DOTFILES_DIR/lib/macos
+  #log "Installing macOS presets:"
+  #$DOTFILES_DIR/lib/macos
 fi
 
-log "Installing dotfiles:"
-$DOTFILES_DIR/lib/dot install
+#log "Installing dotfiles:"
+#$DOTFILES_DIR/lib/dot install
 
 SUCCESS="1"
 log "Setup successful!  Please restart you computer to complete installation."

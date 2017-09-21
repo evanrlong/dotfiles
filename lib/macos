@@ -256,4 +256,7 @@ defaults write com.apple.dock no-bouncing -bool true
 #$DOTFILES_DIR/bin/macos-shortcutter disable -a "Spotlight" -s "Show Spotlight search"
 #$DOTFILES_DIR/bin/macos-shortcutter disable -a "Spotlight" -s "Show Finder search window"
 
+# Set desktop scaling
+# $DOTFILES_DIR/bin/display-scaler 5
+
 echo "Done. Note that some of these changes require a logout/restart to take effect."
