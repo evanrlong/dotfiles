@@ -18,14 +18,12 @@ while getopts "a:s:" opt; do
 	esac
 done
 
-
-
 if [[ $commandArg == "" ]]; then
 	echo ""
 	echo "MacOS shortcutter. Enable/disable global and application shortcuts for macOS from the Terminal."
 	echo "Usage:"
 	echo "enable -a [application name] -s [shortcut name]"
-	echo "disable -a [application name] -s [shortcut name]"show_help;
+	echo "disable -a [application name] -s [shortcut name]";
 	echo ""
 	exit 0;
 fi

@@ -3,8 +3,13 @@
 
 set -e
 
+ISSUES_URL="https://github.com/evanrlong/dotfiles/issues"
+
 cleanup() {
   set +e
+  if [ -n "$SUDO_WAIT_PID" ]; then
+    { sudo kill "$SUDO_WAIT_PID" && wait "$SUDO_WAIT_PID"; } 2>/dev/null
+  fi
   sudo -k
   if [ -z "$SUCCESS" ]; then
     if [ -n "$STEP" ]; then
@@ -14,6 +19,8 @@ cleanup() {
     fi
     if [ -z "$DEBUG" ]; then
       echo "!!! Run '$0 --debug' for debugging output." >&2
+      echo "!!! If you're stuck: file an issue with debugging output at:" >&2
+      echo "!!!   $ISSUES_URL" >&2
     fi
   fi
 }
@@ -30,10 +37,13 @@ groups | grep -q admin || abort "Add $USER to the admin group."
 sudo -k
 sudo -v -p "Enter your password (for sudo access): "
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+SUDO_WAIT_PID="$!"
 
 [ "$1" = "--debug" ] && DEBUG="1"
 if [ -n "$DEBUG" ]; then
   set -x
+else
+  QUIET_FLAG="-q"
 fi
 
 export DOTFILES_DIR=~/.dotfiles
@@ -41,7 +51,7 @@ export DOTFILES_DIR=~/.dotfiles
 logn "Detecting System OS:"
 [ "$(uname -s)" = "Darwin" ] && export MACOS="1" && export UNIX="1" && export OS="macOS"
 [ "$(uname -s)" = "Linux" ] && export LINUX="1" && export UNIX="1" && export OS="linux"
-uname -s | grep -q "_NT-" && export WINDOWS="1" && export OS="windows"
+uname -s | grep $QUIET_FLAG "_NT-" && export WINDOWS="1" && export OS="windows"
 logk
 log "System is running $OS"
 
@@ -58,14 +68,17 @@ if [ -n "$MACOS" ]; then
 
     log "Starting Strap:"
     $DOTFILES_DIR/lib/strap --cached-credentials
+    logk
   fi
 
   log "Installing macOS presets:"
-  $DOTFILES_DIR/lib/macos
+  $DOTFILES_DIR/lib/macos --cached-credentials
+  logk
 fi
 
 log "Installing dotfiles:"
-$DOTFILES_DIR/lib/dot install
+#$DOTFILES_DIR/lib/dot install
+logk
 
 SUCCESS="1"
 log "Setup successful!  Please restart you computer to complete installation."
