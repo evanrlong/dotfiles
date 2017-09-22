@@ -66,9 +66,9 @@ if [ -n "$MACOS" ]; then
     ln -sf $DOTFILES_DIR/Brewfile ~/.Brewfile
     logk
 
-    log "Starting Strap:"
-    $DOTFILES_DIR/lib/strap --cached-credentials
-    logk
+    # log "Starting Strap:"
+    # $DOTFILES_DIR/lib/strap --cached-credentials
+    # logk
   fi
 
   log "Installing macOS presets:"
