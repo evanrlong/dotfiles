@@ -57,7 +57,7 @@ loge()  { STEP="";   [ -n "$QUIET" ] || echo "-->"; }
 
 for ARG in "$@"; do
   case "$ARG" in
-     -c|--cached-credentials)
+    -c|--cached-credentials)
       CACHED_CREDENTIALS="1"
       ;;
     -d|--debug)
@@ -69,7 +69,7 @@ for ARG in "$@"; do
     -q|--quiet)
       QUIET="1"
       ;;
-   -s|--sip-disabled)
+    -s|--sip-disabled)
       SIP_DISABLED="1"
       ;;
   esac
