@@ -1,6 +1,12 @@
 # dotfiles
 
-TODO
+## Installation
+```
+xcode-select --install
+git config --global user.name "Your Name Here"
+git config --global user.email "your_email@youremail.com"
+git config --global credential.helper osxkeychain
+```
 
 ## License
 All of the graphics/images of this project have been made available to this project by Evan Long and are copyrighted;
