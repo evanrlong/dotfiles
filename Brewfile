@@ -29,3 +29,4 @@ cask 'adobe-photoshop-lightroom'
 cask 'adobe-photoshop-lightroom600'
 cask 'simbl'
 cask 'virtualbox'
+mas 'Parallels Desktop Lite', id: 1085114709
