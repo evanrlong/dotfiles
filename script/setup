@@ -71,14 +71,14 @@ if [ -n "$MACOS" ]; then
     # logk
   fi
 
-  log "Installing macOS presets:"
-  $DOTFILES_DIR/lib/macos --cached-credentials
-  logk
+  # log "Installing macOS presets:"
+  # $DOTFILES_DIR/lib/macos --cached-credentials
+  # logk
 fi
 
-log "Installing dotfiles:"
+# log "Installing dotfiles:"
 #$DOTFILES_DIR/lib/dot install
-logk
+# logk
 
 SUCCESS="1"
 log "Setup successful!  Please restart you computer to complete installation."
