@@ -31,25 +31,57 @@ cleanup() {
   [ -z "$EMBEDDED" ] && sudo -k
   if [ -z "$SUCCESS" ]; then
     if [ -n "$STEP" ]; then
-      echo "!!! $STEP FAILED" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! $STEP FAILED$(color white)" >&2
     else
-      echo "!!! FAILED" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! FAILED$(color white)" >&2
     fi
     if [ -z "$DEBUG" ]; then
-      echo "!!! Run '$0 --debug' for debugging output." >&2
-      echo "!!! If you're stuck: file an issue with debugging output at:" >&2
-      echo "!!!   $ISSUES_URL" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! Run '$0 --debug' for debugging output.$(color white)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! If you're stuck: file an issue with debugging output at:$(color white)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! $ISSUES_URL$(color white)" >&2
     fi
   fi
 }
 trap "cleanup" EXIT
 
-abort() { STEP="";   [ -n "$QUIET" ] || echo "${LOG_PREFIX}!!! $*" >&2; exit 1; }
-log()   { STEP="$*"; [ -n "$QUIET" ] || echo "${LOG_PREFIX}--> $*"; }
-logn()  { STEP="$*"; [ -n "$QUIET" ] || printf -- "${LOG_PREFIX}--> %s " "$*"; }
-logk()  { STEP="";   [ -n "$QUIET" ] || echo "OK"; }
-logd()  { STEP="";   [ -n "$QUIET" ] || echo "${LOG_PREFIX}--> OK"; }
+color() {
+  local COLOR_NUM
+  case "$1" in
+    black)
+      COLOR_NUM="0"
+      ;;
+    red)
+      COLOR_NUM="1"
+      ;;
+    green)
+      COLOR_NUM="2"
+      ;;
+    yellow)
+      COLOR_NUM="3"
+      ;;
+    blue)
+      COLOR_NUM="4"
+      ;;
+    magenta)
+      COLOR_NUM="5"
+      ;;
+    cyan)
+      COLOR_NUM="6"
+      ;;
+    white)
+      COLOR_NUM="7"
+      ;;
+  esac
+  tput setaf "$COLOR_NUM"
+}
 
+abort() { STEP="";   [ -n "$QUIET" ] || echo "$(color red)${ABORT_PREFIX}!!! $*$(color white)" >&2; exit 1; }
+log()   { STEP="$*"; [ -n "$QUIET" ] || echo "$(color cyan)${LOG_PREFIX}-->$(color white) $*"; }
+logn()  { STEP="$*"; [ -n "$QUIET" ] || printf -- "$(color cyan)${LOG_PREFIX}-->$(color white) %s " "$*"; }
+logk()  { STEP="";   [ -n "$QUIET" ] || echo "$(color green)OK$(color white)"; }
+logd()  { STEP="";   [ -n "$QUIET" ] || echo "$(color cyan)${LOG_PREFIX}-->$(color green) OK$(color white)"; }
+
+# Parse command line arguments
 for ARG in "$@"; do
   case "$ARG" in
     -d|--debug)
@@ -67,28 +99,45 @@ for ARG in "$@"; do
   esac
 done
 
-[ -n "$EMBEDDED" ] && LOG_PREFIX="-->"
+# Modify logging if script run in embedded mode
+[ -n "$EMBEDDED" ] && LOG_PREFIX="-->" && ABORT_PREFIX="!!!"
 
+# Display help menu if applicable
 if [ -n "$HELP" ]; then
   help_text
   SUCCESS="1"
   exit 0
 fi
 
+# Handle debugging and quite modes
 if [ -n "$DEBUG" ] && [ -z "$QUIET" ]; then
   set -x
 else
   QUIET_FLAG="-q"
 fi
 
+# Abort script if run as root
 [ "$USER" = "root" ] && abort "Run as yourself, not root."
 groups | grep -q admin || abort "Add $USER to the admin group."
 
+# Keep sudo alive for duration of script
 [ -z "$EMBEDDED" ] && sudo -k
 sudo -v -p "Enter your password (for sudo access): "
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 SUDO_WAIT_PID="$!"
 
+# Check and enable full-disk encryption.
+logn "Checking full-disk encryption status:"
+if fdesetup status | grep $QUIET_FLAG -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
+  logk
+else
+  log "Enabling full-disk encryption on next reboot:"
+  sudo fdesetup enable -user "$USER" \
+    | tee ~/Desktop/"FileVault Recovery Key.txt"
+  logd
+fi
+
+# Check if Homebrew is installed
 set +e
 logn "Checking if Homebrew is installed:"
 which -s brew
@@ -96,6 +145,7 @@ which -s brew
 logk
 set -e
 
+# Install/Update Homebrew
 if [ -z "$BREW_INSTALLED" ] ; then
   log "Homebrew is not installed"
   log "Installing Hombrew:"
@@ -108,5 +158,26 @@ else
   logd
 fi
 
+# Check and install/update Homebrew Bundle
+log "Installing/updating Homebrew Bundle and tapping default casks:"
+brew bundle --file=- <<EOF
+tap 'caskroom/cask'
+tap 'homebrew/core'
+tap 'homebrew/services'
+EOF
+logd
+
+# Check and install any remaining software updates.
+logn "Checking for software updates:"
+if softwareupdate -l 2>&1 | grep $QUIET_FLAG "No new software available."; then
+  logk
+else
+  logk
+  log "Installing software updates:"
+  sudo softwareupdate --install --all
+  xcode_license
+  logd
+fi
+
 SUCCESS="1"
-log "Homebrew setup successful!"
+log "$(color green)Homebrew setup successful!$(color white)"
