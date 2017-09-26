@@ -80,3 +80,10 @@ set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
 
 " Activate line numbers
 set number
+
+" Enable Mouse mode
+set mouse=a
+map <ScrollWheelUp> <C-Y>
+map <S-ScrollWheelUp> <C-U>
+map <ScrollWheelDown> <C-E>
+map <S-ScrollWheelDown> <C-D>

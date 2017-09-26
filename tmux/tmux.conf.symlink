@@ -1,5 +1,16 @@
-# MacOS pasteboard fix for tmux
+# Copy-paste integration
 set-option -g default-command "reattach-to-user-namespace -l zsh"
+
+unbind [
+unbind p
+bind c copy-mode
+bind p paste-buffer
+bind-key -T copy-mode-vi v send-keys -X begin-selection
+bind-key -T copy-mode-vi y send-keys -X copy-pipe 'reattach-to-user-namespace pbcopy'
+bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
+
+# Use vim keybindings in copy mode
+setw -g mode-keys vi
 
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
@@ -19,6 +30,9 @@ set -sg escape-time 0
 # Change default tmux shortcut to alt-space
 set-option -g prefix M-Space
 bind M-Space send-prefix
+
+# Set mouse mode
+set-option -g mouse on
 
 # reload config
 bind M-R source-file ~/.tmux.conf

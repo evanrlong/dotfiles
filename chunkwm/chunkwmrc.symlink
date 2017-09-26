@@ -101,4 +101,6 @@ chunkc core::load tiling.so
 
 chunkc tiling::rule --owner \"System Preferences\" --state float
 chunkc tiling::rule --owner Finder --name Copy --state float
-chunkc tiling::rule --owner iTerm2 --role AXWindow --subrole AXDialog --state tile
+chunkc tiling::rule --owner iTerm2 --role AXWindow --subrole AXDialog --except Preferences --state tile
+chunkc tiling::rule --owner iTerm2 --name Preferences --state float
+chunkc tiling::rule --owner \"Parallels Desktop Lite\" --state float
