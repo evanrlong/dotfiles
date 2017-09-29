@@ -63,7 +63,7 @@ if [ -n "$MACOS" ]; then
   
   if [ -n "$SIP" ]; then
     log "Starting Strap:"
-    $DOTFILES_DIR/lib/strap --cached-credentials
+    $DOTFILES_DIR/lib/brew --embedded
     logk
   fi
 
