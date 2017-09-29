@@ -62,13 +62,9 @@ if [ -n "$MACOS" ]; then
   [ -n "$SIP" ] && log "SIP is enabled" || log "SIP is disabled"
   
   if [ -n "$SIP" ]; then
-    logn "Linking Brewfile to home directory:#"
-    ln -sf $DOTFILES_DIR/Brewfile ~/.Brewfile
+    log "Starting Strap:"
+    $DOTFILES_DIR/lib/strap --cached-credentials
     logk
-
-    # log "Starting Strap:"
-    # $DOTFILES_DIR/lib/strap --cached-credentials
-    # logk
   fi
 
   # log "Installing macOS presets:"

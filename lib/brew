@@ -7,6 +7,7 @@
 set -e
 
 ISSUES_URL="https://github.com/evanrlong/dotfiles/issues"
+SCRIPT_DIR=$(cd "$(dirname $0)"; pwd)
 
 help_text() {
 cat <<EOF
@@ -19,6 +20,7 @@ Options:
   -e|--embedded                   run script in embedded mode
                                   caches sudo credentials to prevent pw prompt
   -h|--help                       show script documentation
+  -n|--non-interactive            run script without user prompts
   -q|--quiet                      suppress all logging during script run
 EOF
 }
@@ -31,14 +33,14 @@ cleanup() {
   [ -z "$EMBEDDED" ] && sudo -k
   if [ -z "$SUCCESS" ]; then
     if [ -n "$STEP" ]; then
-      echo "$(color red)${ABORT_PREFIX}!!! $STEP FAILED$(color white)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! $STEP FAILED$(color default)" >&2
     else
-      echo "$(color red)${ABORT_PREFIX}!!! FAILED$(color white)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! FAILED$(color default)" >&2
     fi
     if [ -z "$DEBUG" ]; then
-      echo "$(color red)${ABORT_PREFIX}!!! Run '$0 --debug' for debugging output.$(color white)" >&2
-      echo "$(color red)${ABORT_PREFIX}!!! If you're stuck: file an issue with debugging output at:$(color white)" >&2
-      echo "$(color red)${ABORT_PREFIX}!!! $ISSUES_URL$(color white)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! Run '$0 --debug' for debugging output.$(color default)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! If you're stuck: file an issue with debugging output at:$(color default)" >&2
+      echo "$(color red)${ABORT_PREFIX}!!! $ISSUES_URL$(color default)" >&2
     fi
   fi
 }
@@ -71,15 +73,51 @@ color() {
     white)
       COLOR_NUM="7"
       ;;
+    default)
+      COLOR_NUM="9"
   esac
   tput setaf "$COLOR_NUM"
 }
 
-abort() { STEP="";   [ -n "$QUIET" ] || echo "$(color red)${ABORT_PREFIX}!!! $*$(color white)" >&2; exit 1; }
-log()   { STEP="$*"; [ -n "$QUIET" ] || echo "$(color cyan)${LOG_PREFIX}-->$(color white) $*"; }
-logn()  { STEP="$*"; [ -n "$QUIET" ] || printf -- "$(color cyan)${LOG_PREFIX}-->$(color white) %s " "$*"; }
-logk()  { STEP="";   [ -n "$QUIET" ] || echo "$(color green)OK$(color white)"; }
-logd()  { STEP="";   [ -n "$QUIET" ] || echo "$(color cyan)${LOG_PREFIX}-->$(color green) OK$(color white)"; }
+print_prefix() {
+  local PREFIX_TYPE=$1
+  local INDENT_NUM=$2
+
+  local PREFIX_LOG="$(color cyan)-->$(color default)"
+  local PREFIX_ERR="$(color red)!!!$(color default)"
+  local INDENT_NUM_DEFAULT="1"
+
+  local SELECTED_PREFIX
+  case "$PREFIX_TYPE" in
+    "log")
+      SELECTED_PREFIX="$PREFIX_LOG"
+      ;;
+    "err"|"error")
+      SELECTED_PREFIX="$PREFIX_ERR"
+      ;;
+  esac
+
+  [ -z "$INDENT_NUM" ] && INDENT_NUM="$INDENT_NUM_DEFAULT"
+  case "$INDENT_NUM" in
+    *[!0-9]* | '')
+      INDENT_NUM="$INDENT_NUM_DEFAULT"
+      ;;
+  esac
+
+  local COUNTER=0
+  local OUTPUT
+  while [ $COUNTER -lt $INDENT_NUM ]; do
+    OUTPUT="${OUTPUT}${SELECTED_PREFIX}"
+    let COUNTER=COUNTER+1
+  done
+  echo "$OUTPUT"
+}
+
+abort() { STEP="";   [ -n "$QUIET" ] || echo "$(print_prefix err ${PREFIX_NUM}) $(color red)$*$(color default)" >&2; exit 1; }
+log()   { STEP="$*"; [ -n "$QUIET" ] || echo "$(print_prefix log ${PREFIX_NUM}) $*"; }
+logn()  { STEP="$*"; [ -n "$QUIET" ] || printf -- "$(print_prefix log ${PREFIX_NUM}) %s " "$*"; }
+logk()  { STEP="";   [ -n "$QUIET" ] || echo "$(color green)OK$(color default)"; }
+logd()  { STEP="";   [ -n "$QUIET" ] || echo "$(print_prefix log ${PREFIX_NUM}) $(color green)OK$(color default)"; }
 
 # Parse command line arguments
 for ARG in "$@"; do
@@ -93,14 +131,22 @@ for ARG in "$@"; do
     -h|--help)
       HELP="1"
       ;;
+    -n|--non-interactive)
+      NON_INTEREACTIVE="1"
+      ;;
     -q|--quiet)
       QUIET="1"
       ;;
   esac
 done
 
+
 # Modify logging if script run in embedded mode
-[ -n "$EMBEDDED" ] && LOG_PREFIX="-->" && ABORT_PREFIX="!!!"
+if [ -n "$EMBEDDED" ]; then
+  PREFIX_NUM="2"
+else
+  PREFIX_NUM="1"
+fi
 
 # Display help menu if applicable
 if [ -n "$HELP" ]; then
@@ -122,11 +168,81 @@ groups | grep -q admin || abort "Add $USER to the admin group."
 
 # Keep sudo alive for duration of script
 [ -z "$EMBEDDED" ] && sudo -k
-sudo -v -p "Enter your password (for sudo access): "
+sudo -v -p "$(print_prefix log ${PREFIX_NUM}) Enter your password (for sudo access): "
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 SUDO_WAIT_PID="$!"
 
-# Check and enable full-disk encryption.
+# Read in user name if not already set
+if [ -n "$(git config --global user.name)" ]; then
+  USER_NAME="$(git config --global user.name)"
+else
+  logn "Enter your name:"
+  color magenta
+  read USER_NAME
+  color default
+fi
+
+# Read in user email if not already set
+if [ -n "$(git config --global user.email)" ]; then
+  USER_EMAIL="$(git config --global user.email)"
+else
+  logn "Enter your email:"
+  color magenta
+  read USER_EMAIL
+  color default
+fi
+
+# Set global Git user name
+if [ -n "$USER_NAME" ] && [ -z "$(git config --global user.name)" ]; then
+  logn "Setting Git name:"
+  git config --global user.name "$USER_NAME"
+  logk
+fi
+
+# Set global Git email
+if [ -n "$USER_EMAIL" ] && [ -z "$(git config --global user.email)" ]; then
+  logn "Setting Git email:"
+  git config --global user.email "$USER_EMAIL"
+  logk
+fi
+ 
+# Squelch git 2.x warning message when pushing
+if ! git config push.default >/dev/null; then
+  logn "Squelching git 2.x warning message when pushing:"
+  git config --global push.default simple
+  logk
+fi
+
+# Set up Git credential helper for macOS keychain
+if git credential-osxkeychain 2>&1 | grep $Q "git.credential-osxkeychain" >/dev/null; then
+  if [ "$(git config --global credential.helper)" != "osxkeychain" ]; then
+    logn "Setting up Git osxkeychain credential helper"
+    git config --global credential.helper osxkeychain
+    logk
+  fi
+fi
+
+# Set some basic security settings.
+logn "Configuring security settings:"
+defaults write com.apple.Safari \
+  com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabled \
+  -bool false
+defaults write com.apple.Safari \
+  com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaEnabledForLocalFiles \
+  -bool false
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+sudo launchctl load /System/Library/LaunchDaemons/com.apple.alf.agent.plist 2>/dev/null
+
+if [ -n "$USER_NAME" ] && [ -n "$USER_EMAIL" ]; then
+  sudo defaults write /Library/Preferences/com.apple.loginwindow \
+    LoginwindowText \
+    "Found this computer? Please contact $USER_NAME at $USER_EMAIL."
+fi
+logk
+
+# Check and enable full-disk encryption
 logn "Checking full-disk encryption status:"
 if fdesetup status | grep $QUIET_FLAG -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
   logk
@@ -134,6 +250,18 @@ else
   log "Enabling full-disk encryption on next reboot:"
   sudo fdesetup enable -user "$USER" \
     | tee ~/Desktop/"FileVault Recovery Key.txt"
+  logd
+fi
+
+# Check and install system software updates
+logn "Checking for software updates:"
+if softwareupdate -l 2>&1 | grep $QUIET_FLAG "No new software available."; then
+  logk
+else
+  logk
+  log "Installing software updates:"
+  sudo softwareupdate --install --all
+  xcode_license
   logd
 fi
 
@@ -147,18 +275,16 @@ set -e
 
 # Install/Update Homebrew
 if [ -z "$BREW_INSTALLED" ] ; then
-  log "Homebrew is not installed"
-  log "Installing Hombrew:"
+  log "Installing Homebrew:"
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" </dev/null
   logd
 else
-  log "Homebrew is installed"
-  log "Updating Brew:"
+  log "Updating Homebrew:"
   brew update
   logd
 fi
 
-# Check and install/update Homebrew Bundle
+# Install/update Homebrew Bundle
 log "Installing/updating Homebrew Bundle and tapping default casks:"
 brew bundle --file=- <<EOF
 tap 'caskroom/cask'
@@ -167,17 +293,19 @@ tap 'homebrew/services'
 EOF
 logd
 
-# Check and install any remaining software updates.
-logn "Checking for software updates:"
-if softwareupdate -l 2>&1 | grep $QUIET_FLAG "No new software available."; then
+# Link Brewfile to home directory
+if [ -f "$SCRIPT_DIR/../Brewfile" ] && [ ! -f "$HOME/.Brewfile" ]; then
+  logn "Linking Brewfile to home directory:"
+  ln -sf "$SCRIPT_DIR/../Brewfile" "$HOME/.Brewfile"
   logk
-else
-  logk
-  log "Installing software updates:"
-  sudo softwareupdate --install --all
-  xcode_license
+fi
+
+# Install from local Brewfile
+if [ -f "$HOME/.Brewfile" ]; then
+  log "Installing from user Brewfile:"
+  brew bundle check --global || brew bundle --global
   logd
 fi
 
 SUCCESS="1"
-log "$(color green)Homebrew setup successful!$(color white)"
+log "$(color green)Homebrew setup successful!$(color default)"
