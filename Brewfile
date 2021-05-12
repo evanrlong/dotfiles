@@ -21,6 +21,7 @@ brew 'coreutils'
 brew 'certbot'
 brew 'koekeishiya/formulae/skhd', restart_service: true
 brew 'hashicorp/tap/terraform'
+brew 'redis'
 
 cask 'visual-studio-code'
 cask 'docker'
@@ -47,3 +48,4 @@ cask 'discord'
 cask 'qmk-toolbox'
 cask 'via'
 cask 'adoptopenjdk13'
+cask 'figma'
